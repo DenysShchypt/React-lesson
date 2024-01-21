@@ -1,3 +1,4 @@
+import { Component } from 'react';
 import css from './App.module.css';
 import { Product } from './Product/Product';
 import { Section } from './Section/Section';
@@ -34,26 +35,59 @@ const productsData = [
     discount: 0.2,
   },
 ];
-export const App = () => {
-  return (
-    <div>
-      <Section>
-        <h1>My lists of products</h1>
-      </Section>
-      <Section title="Product List">
-        <div className={css.productList}>
-          {productsData.map(product => {
-            return (
-              <Product
-                key={product.id}
-                title={product.title}
-                price={product.price}
-                discount={product.discount}
-              />
-            );
-          })}
-        </div>
-      </Section>
-    </div>
-  );
-};
+export class App extends Component {
+  state = {
+    products: productsData,
+    quantityProducts: 0,
+    totalPrice: 0,
+    totalDiscount: 0,
+    totalPriceWithDiscount: 0,
+  };
+  // handleProducts = () => {}
+  // handleQuantityProducts = () => {
+  //   this.setState({
+  //     quantityProducts: this.state.products.length,
+  //   });
+  // };
+  // handleTotalPrice = () => {}
+  // handleTotalDiscount = () => {}
+  // handleTotalPriceWithDiscount = () => {}
+  // handleAddProduct = () => {}
+  handleRemoveProduct = idProduct => {
+    this.setState({
+      products: this.state.products.filter(prod => prod.id !== idProduct),
+    });
+  };
+  // handleUpdateProduct = () => {}
+  // handleClearCart = () => {}
+  // handleCheckout = () => {}
+  render() {
+    // Сортування продукту
+    const productsSort = this.state.products.sort(
+      (a, b) => a.discount - b.discount
+    );
+    return (
+      <div>
+        <Section>
+          <h1>My list of products has {this.state.products.length} products</h1>
+        </Section>
+        <Section title="Product List">
+          <div className={css.productList}>
+            {productsSort.map(product => {
+              return (
+                <Product
+                  key={product.id}
+                  id={product.id}
+                  title={product.title}
+                  price={product.price}
+                  discount={product.discount}
+                  handleRemoveProduct={this.handleRemoveProduct}
+                />
+              );
+            })}
+          </div>
+        </Section>
+      </div>
+    );
+  }
+}

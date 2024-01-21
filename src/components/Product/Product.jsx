@@ -1,5 +1,11 @@
 import css from './Product.module.css';
-export const Product = ({ title, prise, discount }) => {
+export const Product = ({
+  id,
+  title,
+  prise,
+  discount,
+  handleRemoveProduct,
+}) => {
   const productBg = discount ? '#0ea700d4' : '#ebfc00';
   const productStyle = {
     backgroundColor: productBg,
@@ -16,13 +22,19 @@ export const Product = ({ title, prise, discount }) => {
       <h2>Title:{title}</h2>
       <p>Price: {prise}$</p>
       {discount ? (
-        <h3 className={css.discountBage}>Discount: {discount}$</h3>
+        <h3 className={css.discountBage}>Discount: {discount}%</h3>
       ) : (
         <h3 className={css.apology}>Discount is absent</h3>
       )}
       <button type="button" className={css.productAddToCartBtn}>
-        {' '}
         Buy the product
+      </button>
+      <button
+        type="button"
+        className={css.productRemoveBtn}
+        onClick={() => handleRemoveProduct(id)}
+      >
+        Remove the product &times;
       </button>
     </div>
   );
