@@ -1,11 +1,5 @@
 import css from './Product.module.css';
-export const Product = ({
-  id,
-  title,
-  prise,
-  discount,
-  handleRemoveProduct,
-}) => {
+const Product = ({ id, title, price, discount, handleRemoveProduct }) => {
   const productBg = discount ? '#0ea700d4' : '#ebfc00';
   const productStyle = {
     backgroundColor: productBg,
@@ -20,7 +14,8 @@ export const Product = ({
         className={css.productImg}
       />
       <h2>Title:{title}</h2>
-      <p>Price: {prise}$</p>
+      <p>Price: {price}$</p>
+
       {discount ? (
         <h3 className={css.discountBage}>Discount: {discount}%</h3>
       ) : (
@@ -39,3 +34,5 @@ export const Product = ({
     </div>
   );
 };
+
+export default Product;

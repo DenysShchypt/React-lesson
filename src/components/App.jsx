@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import css from './App.module.css';
-import { Product } from './Product/Product';
-import { Section } from './Section/Section';
+import { nanoid } from 'nanoid';
+import { AddProductForm, Section, Product } from './index.js';
 
 const productsData = [
   {
@@ -59,7 +59,22 @@ export class App extends Component {
     });
   };
   // handleUpdateProduct = () => {}
-  // handleClearCart = () => {}
+  handleAddProduct = addProduct => {
+    const checkOneProduct = this.state.products.some(
+      product => product.title === addProduct.title
+    );
+    if (checkOneProduct) {
+      alert('This product is already in the list');
+      return;
+    }
+    const addIdProduct = {
+      ...addProduct,
+      id: nanoid(),
+    };
+    this.setState({
+      products: [...this.state.products, addIdProduct],
+    });
+  };
   // handleCheckout = () => {}
   render() {
     // Сортування продукту
@@ -71,6 +86,7 @@ export class App extends Component {
         <Section>
           <h1>My list of products has {this.state.products.length} products</h1>
         </Section>
+
         <Section title="Product List">
           <div className={css.productList}>
             {productsSort.map(product => {
@@ -86,6 +102,10 @@ export class App extends Component {
               );
             })}
           </div>
+        </Section>
+
+        <Section title="Add new product">
+          <AddProductForm handleAddProduct={this.handleAddProduct} />
         </Section>
       </div>
     );
