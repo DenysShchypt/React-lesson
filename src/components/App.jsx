@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import css from './App.module.css';
 import { nanoid } from 'nanoid';
-import { AddProductForm, Section, Product } from './index.js';
+import { AddProductForm, Section, Product, ModalWindow } from './index.js';
 
 const productsData = [
   {
@@ -38,27 +38,27 @@ const productsData = [
 export class App extends Component {
   state = {
     products: productsData,
-    quantityProducts: 0,
-    totalPrice: 0,
-    totalDiscount: 0,
-    totalPriceWithDiscount: 0,
+    modalIsOpen: false,
+    modelData: null,
   };
-  // handleProducts = () => {}
-  // handleQuantityProducts = () => {
-  //   this.setState({
-  //     quantityProducts: this.state.products.length,
-  //   });
-  // };
-  // handleTotalPrice = () => {}
-  // handleTotalDiscount = () => {}
-  // handleTotalPriceWithDiscount = () => {}
-  // handleAddProduct = () => {}
+  componentDidMount() {
+    const localProduct = localStorage.getItem('Products');
+    const parseLocalProduct = JSON.parse(localProduct) ?? [];
+    this.setState({ products: parseLocalProduct });
+  }
+  componentDidUpdate(_, prevState) {
+    if (this.state.products !== prevState.products) {
+      const localProduct = JSON.stringify(this.state.products);
+      localStorage.setItem('Products', localProduct);
+    }
+  }
+
   handleRemoveProduct = idProduct => {
     this.setState({
       products: this.state.products.filter(prod => prod.id !== idProduct),
     });
   };
-  // handleUpdateProduct = () => {}
+
   handleAddProduct = addProduct => {
     const checkOneProduct = this.state.products.some(
       product => product.title === addProduct.title
@@ -75,7 +75,21 @@ export class App extends Component {
       products: [...this.state.products, addIdProduct],
     });
   };
-  // handleCheckout = () => {}
+
+  openModal = dataModal => {
+    this.setState({
+      modalIsOpen: true,
+      modelData: dataModal,
+    });
+  };
+
+  closeModal = () => {
+    this.setState({
+      modalIsOpen: false,
+      modelData: null,
+    });
+  };
+
   render() {
     // Сортування продукту
     const productsSort = this.state.products.sort(
@@ -98,6 +112,7 @@ export class App extends Component {
                   price={product.price}
                   discount={product.discount}
                   handleRemoveProduct={this.handleRemoveProduct}
+                  openModal={this.openModal}
                 />
               );
             })}
@@ -107,6 +122,12 @@ export class App extends Component {
         <Section title="Add new product">
           <AddProductForm handleAddProduct={this.handleAddProduct} />
         </Section>
+        {this.state.modalIsOpen && (
+          <ModalWindow
+            closeModal={this.closeModal}
+            modelData={this.state.modelData}
+          />
+        )}
       </div>
     );
   }

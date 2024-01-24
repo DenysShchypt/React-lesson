@@ -1,5 +1,12 @@
 import css from './Product.module.css';
-const Product = ({ id, title, price, discount, handleRemoveProduct }) => {
+const Product = ({
+  id,
+  title,
+  price,
+  discount,
+  handleRemoveProduct,
+  openModal,
+}) => {
   const productBg = discount ? '#0ea700d4' : '#ebfc00';
   const productStyle = {
     backgroundColor: productBg,
@@ -30,6 +37,13 @@ const Product = ({ id, title, price, discount, handleRemoveProduct }) => {
         onClick={() => handleRemoveProduct(id)}
       >
         Remove the product &times;
+      </button>
+      <button
+        onClick={() => openModal({ title, price, discount })}
+        className={css.productRemoveBtn}
+        type="button"
+      >
+        About product
       </button>
     </div>
   );
