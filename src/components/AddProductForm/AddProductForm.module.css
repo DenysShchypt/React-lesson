@@ -1,0 +1,12 @@
+.formAddProduct {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.textName {
+  margin: 0;
+  padding: 4px;
+  font-weight: 500;
+  font-size: 18px;
+}
