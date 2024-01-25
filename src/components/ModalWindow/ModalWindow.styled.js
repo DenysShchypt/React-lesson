@@ -10,11 +10,12 @@ export const ModalStyle = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
+  /* background-color: ${prop => prop.specialBg ? 'rgba(200, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.5)'}; */
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+   z-index: 1000;
   &:hover{
-    cursor: pointer;
-  }
+  cursor: pointer;
+}
 .modal{
   position: absolute;
   width: 400px;
@@ -25,6 +26,15 @@ export const ModalStyle = styled.div`
    &:hover{
     cursor: auto;
   }
+}
+.productImg {
+  max-width: 350px;
+  width: 100%;
+  height: 250px;
+  aspect-ratio: 1 / 1;
+
+  object-fit: cover;
+  object-position: center;
 }
 .closeBtn{
   position: absolute;

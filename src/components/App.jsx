@@ -1,55 +1,56 @@
 import { Component } from 'react';
 import css from './App.module.css';
+import axios from 'axios';
 import { nanoid } from 'nanoid';
-import { AddProductForm, Section, Product, ModalWindow } from './index.js';
+import {
+  AddProductForm,
+  Section,
+  Product,
+  ModalWindow,
+  Spinner,
+} from './index.js';
 
-const productsData = [
-  {
-    id: '3',
-    title: 'Tacos With Lime M',
-    price: 5.85,
-    discount: 15,
-  },
-  {
-    id: '1',
-    title: 'Tacos With Lime XXL',
-    price: 10.99,
-    discount: 30,
-  },
-  {
-    id: '2',
-    title: 'Tacos With Lime XL',
-    price: 6.99,
-    discount: null,
-  },
-  {
-    id: '4',
-    title: 'Tacos S',
-    price: 1.5,
-    discount: null,
-  },
-  {
-    id: '5',
-    title: 'Tacos With Cheese',
-    price: 3.4,
-    discount: 0.2,
-  },
-];
 export class App extends Component {
   state = {
-    products: productsData,
+    products: null,
+    loading: false,
+    productId: null,
     modalIsOpen: false,
     modelData: null,
+    productDescriptionData: null,
   };
+  fetchGetAll = async () => {
+    try {
+      this.setState({ loading: true });
+
+      const { data } = await axios.get('https://fakestoreapi.com/products');
+      this.setState({ products: data });
+    } catch (error) {
+      this.setState({ error: error.message });
+    } finally {
+      this.setState({ loading: false });
+    }
+  };
+  fetchGetOne = async () => {
+    try {
+      this.setState({ loading: true });
+      const { data } = await axios.get(
+        `https://fakestoreapi.com/products/${this.state.productId}`
+      );
+      this.setState({ productDescriptionData: data });
+    } catch (error) {
+      this.setState({ error: error.message });
+    } finally {
+      this.setState({ loading: false });
+    }
+  };
+
   componentDidMount() {
-    const localProduct = localStorage.getItem('Products');
-    const parseLocalProduct = JSON.parse(localProduct) ?? [];
-    this.setState({ products: parseLocalProduct });
+    this.fetchGetAll();
   }
   componentDidUpdate(_, prevState) {
-    if (this.state.products !== prevState.products) {
-      const localProduct = JSON.stringify(this.state.products);
-      localStorage.setItem('Products', localProduct);
+    if (prevState.productId !== this.state.productId) {
+      this.fetchGetOne();
     }
   }
 
@@ -90,34 +91,52 @@ export class App extends Component {
     });
   };
 
+  onSelectProduct = prodId => {
+    this.setState({
+      productId: prodId,
+    });
+  };
+
   render() {
-    // Сортування продукту
-    const productsSort = this.state.products.sort(
-      (a, b) => a.discount - b.discount
-    );
     return (
       <div>
-        <Section>
-          <h1>My list of products has {this.state.products.length} products</h1>
-        </Section>
+        {this.state.loading && <Spinner />}
+        {this.state.products !== null && (
+          <Section>
+            <h1>
+              My list of products has
+              {this.state.products.length}
+              products
+            </h1>
+          </Section>
+        )}
 
-        <Section title="Product List">
-          <div className={css.productList}>
-            {productsSort.map(product => {
-              return (
-                <Product
-                  key={product.id}
-                  id={product.id}
-                  title={product.title}
-                  price={product.price}
-                  discount={product.discount}
-                  handleRemoveProduct={this.handleRemoveProduct}
-                  openModal={this.openModal}
-                />
-              );
-            })}
-          </div>
-        </Section>
+        {this.state.products !== null && (
+          <Section title="Product List">
+            <ul className={css.productList}>
+              {this.state.products
+                .sort((a, b) => a.price - b.price)
+                .map(product => {
+                  return (
+                    <Product
+                      key={product.id}
+                      id={product.id}
+                      title={product.title}
+                      price={product.price}
+                      discount={product.discount}
+                      description={product.description}
+                      category={product.category}
+                      image={product.image}
+                      handleRemoveProduct={this.handleRemoveProduct}
+                      openModal={this.openModal}
+                      onSelectProduct={this.onSelectProduct}
+                      productDescriptionData={this.state.productDescriptionData}
+                    />
+                  );
+                })}
+            </ul>
+          </Section>
+        )}
 
         <Section title="Add new product">
           <AddProductForm handleAddProduct={this.handleAddProduct} />

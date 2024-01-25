@@ -32,8 +32,15 @@ class ModalWindow extends Component {
           >
             ✖
           </button>
+          <img
+            className="productImg"
+            src={this.props.modelData.image}
+            alt="product"
+          />
           <h2 className="text">Title products :{this.props.modelData.title}</h2>
           <p className="text">Price:{this.props.modelData.price}</p>
+          <p className="text">Category:{this.props.modelData.category}</p>
+          <p className="text">Description:{this.props.modelData.description}</p>
           <p className="text">Discount:{this.props.modelData.discount}</p>
         </div>
       </ModalStyle>

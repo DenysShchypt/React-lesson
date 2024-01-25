@@ -1,51 +1,65 @@
-import css from './Product.module.css';
+import { Products } from './Product.styled';
 const Product = ({
   id,
   title,
   price,
-  discount,
+  category,
+  description,
+  image,
   handleRemoveProduct,
   openModal,
+  discount,
+  onSelectProduct,
+  productDescriptionData,
 }) => {
-  const productBg = discount ? '#0ea700d4' : '#ebfc00';
+  const productBg = discount ? '#aaffaad3' : '#badad7';
   const productStyle = {
     backgroundColor: productBg,
     color: discount ? 'white' : 'black',
   };
   return (
-    <div className={css.product} style={productStyle}>
-      <img
-        src="https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?dpr=2&h=480&w=640"
-        alt="Tacos With Lime"
-        width="640"
-        className={css.productImg}
-      />
-      <h2>Title:{title}</h2>
-      <p>Price: {price}$</p>
+    <Products key={id} style={productStyle} onClick={() => onSelectProduct(id)}>
+      <div className="containerDescription">
+        <img className="productImg" src={image} alt="product" />
+        <h2>{title}</h2>
+        <p className="textItem">Price:{price}$</p>
+        <p className="textItem">Category:{category}</p>
+        {productDescriptionData !== null && productDescriptionData.id === id ? (
+          <p className="textItem">
+            Description:{productDescriptionData.description}
+          </p>
+        ) : (
+          <p className="textItem">Press for description👁‍🗨</p>
+        )}
+      </div>
 
-      {discount ? (
-        <h3 className={css.discountBage}>Discount: {discount}%</h3>
-      ) : (
-        <h3 className={css.apology}>Discount is absent</h3>
-      )}
-      <button type="button" className={css.productAddToCartBtn}>
-        Buy the product
-      </button>
-      <button
-        type="button"
-        className={css.productRemoveBtn}
-        onClick={() => handleRemoveProduct(id)}
-      >
-        Remove the product &times;
-      </button>
-      <button
-        onClick={() => openModal({ title, price, discount })}
-        className={css.productRemoveBtn}
-        type="button"
-      >
-        About product
-      </button>
-    </div>
+      <div className="containerBtn">
+        {discount ? (
+          <h3 className="discountBage">Discount: {discount}%</h3>
+        ) : (
+          <h3 className="apology">Discount is absent</h3>
+        )}
+        <button type="button" className="productBtn">
+          Buy the product
+        </button>
+        <button
+          type="button"
+          className="productBtn"
+          onClick={() => handleRemoveProduct(id)}
+        >
+          Remove the product &times;
+        </button>
+        <button
+          onClick={() =>
+            openModal({ title, price, image, description, category })
+          }
+          className="productBtn"
+          type="button"
+        >
+          About product
+        </button>
+      </div>
+    </Products>
   );
 };
 
