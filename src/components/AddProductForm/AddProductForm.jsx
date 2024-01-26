@@ -1,98 +1,88 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import css from './AddProductForm.module.css';
-const initialState = {
-  title: '',
-  price: 0,
-  discount: 0,
-  checkout: false,
-};
-class AddProductForm extends Component {
-  state = {
-    ...initialState,
-  };
-  // Неконтрольована форма
-  // handleSubmit = e => {
-  //   e.preventDefault();
-  //   const element = e.currentTarget.elements;
-  //   const choiceDiscount = element.checkout.checked;
-  //   const elementsForm = {
-  //     title: element.title.value,
-  //     price: Number.parseFloat(element.price.value),
-  //     discount: choiceDiscount
-  //       ? Number.parseFloat(element.discount.value)
-  //       : null,
-  //   };
-  //   this.props.handleAddProduct(elementsForm);
-  //   e.target.reset();
-  // };
-  handleSubmit = e => {
+// const initialState = {
+//   title: '',
+//   price: 0,
+//   discount: 0,
+//   checkout: false,
+// };
+const AddProductForm = ({ handleAddProduct }) => {
+  const [title, setTitle] = useState('');
+  const [price, setPrise] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [checkout, setCheckout] = useState(false);
+  const handleSubmit = e => {
     e.preventDefault();
-    const choiceDiscount = this.state.checkout;
+    const choiceDiscount = checkout;
     const elementsForm = {
-      title: this.state.title,
-      price: Number.parseFloat(this.state.price),
-      discount: choiceDiscount ? Number.parseFloat(this.state.discount) : null,
+      title,
+      price: Number.parseFloat(price),
+      discount: choiceDiscount ? Number.parseFloat(discount) : null,
     };
-    this.props.handleAddProduct(elementsForm);
-    this.setState({ ...initialState });
+    handleAddProduct(elementsForm);
+    setTitle('');
+    setPrise(0);
+    setDiscount(0);
+    setCheckout(false);
   };
 
-  handleChange = e => {
+  const handleChange = e => {
     const value =
       e.currentTarget.type === 'checkbox'
         ? e.currentTarget.checked
         : e.currentTarget.value;
-
-    this.setState({
-      [e.target.name]: value,
-    });
+    const name = e.target.name;
+    switch (name) {
+      case 'title':
+        setTitle(value);
+        return;
+      case 'price':
+        setPrise(value);
+        return;
+      case 'checkout':
+        setCheckout(value);
+        return;
+      case 'discount':
+        setDiscount(value);
+        return;
+      default:
+        return;
+    }
   };
 
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit} className={css.formAddProduct}>
+  return (
+    <form onSubmit={handleSubmit} className={css.formAddProduct}>
+      <label>
+        <p className={css.textName}>Title</p>
+        <input type="text" name="title" onChange={handleChange} value={title} />
+      </label>
+      <label>
+        <p className={css.textName}>Prise</p>
+        <input type="text" name="price" onChange={handleChange} value={price} />
+      </label>
+      <label>
+        <p className={css.textName}>Choice discount</p>
+        <input
+          type="checkbox"
+          name="checkout"
+          onChange={handleChange}
+          checked={checkout}
+        />
+      </label>
+      {checkout && (
         <label>
-          <p className={css.textName}>Title</p>
+          <p className={css.textName}>Discount</p>
           <input
             type="text"
-            name="title"
-            onChange={this.handleChange}
-            value={this.state.title}
+            name="discount"
+            onChange={handleChange}
+            value={discount}
           />
         </label>
-        <label>
-          <p className={css.textName}>Prise</p>
-          <input
-            type="text"
-            name="price"
-            onChange={this.handleChange}
-            value={this.state.price}
-          />
-        </label>
-        <label>
-          <p className={css.textName}>Choice discount</p>
-          <input
-            type="checkbox"
-            name="checkout"
-            onChange={this.handleChange}
-            checked={this.state.checkout}
-          />
-        </label>
-        {this.state.checkout && (
-          <label>
-            <p className={css.textName}>Discount</p>
-            <input
-              type="text"
-              name="discount"
-              onChange={this.handleChange}
-              value={this.state.discount}
-            />
-          </label>
-        )}
-        <button type="submit">Add product</button>
-      </form>
-    );
-  }
-}
+      )}
+      <button type="submit">Add product</button>
+    </form>
+  );
+};
 
 export default AddProductForm;

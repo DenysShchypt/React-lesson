@@ -1,51 +1,46 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import { ModalStyle } from './ModalWindow.styled';
 
-class ModalWindow extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleEscapeClose);
-    document.body.style.overflow = 'hidden';
-  }
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleEscapeClose);
-    document.body.style.overflow = 'auto';
-  }
-  handleOverlayClick = e => {
+const ModalWindow = ({ closeModal, modelData }) => {
+  useEffect(
+    e => {
+      const handleEscapeClose = e => {
+        if (e.code === 'Escape') {
+          closeModal();
+        }
+      };
+      window.addEventListener('keydown', handleEscapeClose);
+      document.body.style.overflow = 'hidden';
+
+      return () => {
+        window.removeEventListener('keydown', handleEscapeClose);
+        document.body.style.overflow = 'auto';
+      };
+    },
+    [closeModal]
+  );
+
+  const handleOverlayClick = e => {
     if (e.target === e.currentTarget) {
-      this.props.closeModal();
-    }
-  };
-  handleEscapeClose = e => {
-    if (e.code === 'Escape') {
-      this.props.closeModal();
+      closeModal();
     }
   };
 
-  render() {
-    return (
-      <ModalStyle onClick={this.handleOverlayClick}>
-        <div className="modal">
-          <button
-            onClick={this.props.closeModal}
-            type="button"
-            className="closeBtn"
-          >
-            ✖
-          </button>
-          <img
-            className="productImg"
-            src={this.props.modelData.image}
-            alt="product"
-          />
-          <h2 className="text">Title products :{this.props.modelData.title}</h2>
-          <p className="text">Price:{this.props.modelData.price}</p>
-          <p className="text">Category:{this.props.modelData.category}</p>
-          <p className="text">Description:{this.props.modelData.description}</p>
-          <p className="text">Discount:{this.props.modelData.discount}</p>
-        </div>
-      </ModalStyle>
-    );
-  }
-}
+  return (
+    <ModalStyle onClick={handleOverlayClick}>
+      <div className="modal">
+        <button onClick={closeModal} type="button" className="closeBtn">
+          ✖
+        </button>
+        <img className="productImg" src={modelData.image} alt="product" />
+        <h2 className="text">Title products :{modelData.title}</h2>
+        <p className="text">Price:{modelData.price}</p>
+        <p className="text">Category:{modelData.category}</p>
+        <p className="text">Description:{modelData.description}</p>
+        <p className="text">Discount:{modelData.discount}</p>
+      </div>
+    </ModalStyle>
+  );
+};
 
 export default ModalWindow;

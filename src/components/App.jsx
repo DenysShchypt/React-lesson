@@ -1,6 +1,5 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import css from './App.module.css';
-import axios from 'axios';
 import { nanoid } from 'nanoid';
 import {
   AddProductForm,
@@ -9,59 +8,41 @@ import {
   ModalWindow,
   Spinner,
 } from './index.js';
+import { useEffect } from 'react';
+import { fetchGetAll, fetchGetOne } from 'Api';
 
-export class App extends Component {
-  state = {
-    products: null,
-    loading: false,
-    productId: null,
-    modalIsOpen: false,
-    modelData: null,
-    productDescriptionData: null,
-  };
-  fetchGetAll = async () => {
-    try {
-      this.setState({ loading: true });
-
-      const { data } = await axios.get('https://fakestoreapi.com/products');
-      this.setState({ products: data });
-    } catch (error) {
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ loading: false });
+export const App = () => {
+  const [products, setProducts] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [productId, setProductId] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modelData, setModelData] = useState(null);
+  const [productDescriptionData, setProductDescriptionData] = useState(null);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    async function fetchRequest() {
+      try {
+        setLoading(true);
+        setError(false);
+        setProducts(await fetchGetAll());
+        if (null !== productId) {
+          setProductDescriptionData(await fetchGetOne(productId));
+        }
+      } catch (error) {
+        setError(false);
+      } finally {
+        setLoading(false);
+      }
     }
-  };
-  fetchGetOne = async () => {
-    try {
-      this.setState({ loading: true });
-      const { data } = await axios.get(
-        `https://fakestoreapi.com/products/${this.state.productId}`
-      );
-      this.setState({ productDescriptionData: data });
-    } catch (error) {
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ loading: false });
-    }
+    fetchRequest();
+  }, [productId]);
+
+  const handleRemoveProduct = idProduct => {
+    setProducts(products.filter(prod => prod.id !== idProduct));
   };
 
-  componentDidMount() {
-    this.fetchGetAll();
-  }
-  componentDidUpdate(_, prevState) {
-    if (prevState.productId !== this.state.productId) {
-      this.fetchGetOne();
-    }
-  }
-
-  handleRemoveProduct = idProduct => {
-    this.setState({
-      products: this.state.products.filter(prod => prod.id !== idProduct),
-    });
-  };
-
-  handleAddProduct = addProduct => {
-    const checkOneProduct = this.state.products.some(
+  const handleAddProduct = addProduct => {
+    const checkOneProduct = products.some(
       product => product.title === addProduct.title
     );
     if (checkOneProduct) {
@@ -72,82 +53,82 @@ export class App extends Component {
       ...addProduct,
       id: nanoid(),
     };
-    this.setState({
-      products: [...this.state.products, addIdProduct],
-    });
+    setProducts(...products, addIdProduct);
   };
 
-  openModal = dataModal => {
-    this.setState({
-      modalIsOpen: true,
-      modelData: dataModal,
-    });
+  const openModal = dataModal => {
+    setModalIsOpen(true);
+    setModelData(dataModal);
   };
 
-  closeModal = () => {
-    this.setState({
-      modalIsOpen: false,
-      modelData: null,
-    });
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setModelData(null);
   };
 
-  onSelectProduct = prodId => {
-    this.setState({
-      productId: prodId,
-    });
+  const onSelectProduct = prodId => {
+    setProductId(prodId);
   };
-
-  render() {
-    return (
-      <div>
-        {this.state.loading && <Spinner />}
-        {this.state.products !== null && (
-          <Section>
-            <h1>
-              My list of products has
-              {this.state.products.length}
-              products
-            </h1>
-          </Section>
-        )}
-
-        {this.state.products !== null && (
-          <Section title="Product List">
-            <ul className={css.productList}>
-              {this.state.products
-                .sort((a, b) => a.price - b.price)
-                .map(product => {
-                  return (
-                    <Product
-                      key={product.id}
-                      id={product.id}
-                      title={product.title}
-                      price={product.price}
-                      discount={product.discount}
-                      description={product.description}
-                      category={product.category}
-                      image={product.image}
-                      handleRemoveProduct={this.handleRemoveProduct}
-                      openModal={this.openModal}
-                      onSelectProduct={this.onSelectProduct}
-                      productDescriptionData={this.state.productDescriptionData}
-                    />
-                  );
-                })}
-            </ul>
-          </Section>
-        )}
-
-        <Section title="Add new product">
-          <AddProductForm handleAddProduct={this.handleAddProduct} />
+  return (
+    <div>
+      {error && 'Sorry, there is no information!'}
+      {loading && <Spinner />}
+      {products !== null && (
+        <Section>
+          <h1>
+            My list of products has
+            {products.length}
+            products
+          </h1>
         </Section>
-        {this.state.modalIsOpen && (
-          <ModalWindow
-            closeModal={this.closeModal}
-            modelData={this.state.modelData}
-          />
-        )}
-      </div>
-    );
-  }
-}
+      )}
+
+      {products !== null && (
+        <Section title="Product List">
+          <ul className={css.productList}>
+            {products
+              .sort((a, b) => a.price - b.price)
+              .map(product => {
+                return (
+                  <Product
+                    key={product.id}
+                    id={product.id}
+                    title={product.title}
+                    price={product.price}
+                    discount={product.discount}
+                    description={product.description}
+                    category={product.category}
+                    image={product.image}
+                    handleRemoveProduct={handleRemoveProduct}
+                    openModal={openModal}
+                    onSelectProduct={onSelectProduct}
+                    productDescriptionData={productDescriptionData}
+                  />
+                );
+              })}
+          </ul>
+        </Section>
+      )}
+
+      <Section title="Add new product">
+        <AddProductForm handleAddProduct={handleAddProduct} />
+      </Section>
+      {modalIsOpen && (
+        <ModalWindow closeModal={closeModal} modelData={modelData} />
+      )}
+    </div>
+  );
+};
+
+// componentDidMount;
+// useEffect(() => {}, []);
+
+// componentDidMount;
+// componentDidUpdate;
+// useEffect(() => { }, [dep1, dep2, ...]);
+
+// componentDidMount;
+// useEffect(() => {
+//   return () => {
+//   };
+// }, []);
