@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import css from './AddProductForm.module.css';
 // const initialState = {
 //   title: '',
@@ -11,6 +11,7 @@ const AddProductForm = ({ handleAddProduct }) => {
   const [price, setPrise] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [checkout, setCheckout] = useState(false);
+  const inputRef = useRef(null);
   const handleSubmit = e => {
     e.preventDefault();
     const choiceDiscount = checkout;
@@ -25,6 +26,11 @@ const AddProductForm = ({ handleAddProduct }) => {
     setDiscount(0);
     setCheckout(false);
   };
+
+  useEffect(() => {
+    if (!inputRef.current) return;
+    inputRef.current.focus();
+  }, []);
 
   const handleChange = e => {
     const value =
@@ -54,7 +60,13 @@ const AddProductForm = ({ handleAddProduct }) => {
     <form onSubmit={handleSubmit} className={css.formAddProduct}>
       <label>
         <p className={css.textName}>Title</p>
-        <input type="text" name="title" onChange={handleChange} value={title} />
+        <input
+          ref={inputRef}
+          type="text"
+          name="title"
+          onChange={handleChange}
+          value={title}
+        />
       </label>
       <label>
         <p className={css.textName}>Prise</p>
