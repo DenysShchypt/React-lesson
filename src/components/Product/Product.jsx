@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Products } from './Product.styled';
 const Product = ({
   id,
@@ -39,9 +40,11 @@ const Product = ({
         ) : (
           <h3 className="apology">Discount is absent</h3>
         )}
-        <button type="button" className="productBtn">
-          Buy the product
-        </button>
+        <Link to={`/products/${id}`}>
+          <button type="button" className="productBtn">
+            Page product
+          </button>
+        </Link>
         <button
           type="button"
           className="productBtn"
