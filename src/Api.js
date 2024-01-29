@@ -12,3 +12,9 @@ export const fetchGetOne = async (productId) => {
     );
     return data;
 };
+export const fetchGetOneProductTitle = async (title) => {
+    const { data } = await axios.get(
+        `/?sort='${title}`
+    );
+    return data;
+};
